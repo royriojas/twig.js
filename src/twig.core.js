@@ -993,7 +993,7 @@ var Twig = (function (Twig) {
      * @return {string} The canonical version of the path.
      */
     function relativePath(template, file) {
-        var base,
+        var base = '',
             base_path,
             sep_chr = "/",
             new_path = [],
@@ -1006,21 +1006,28 @@ var Twig = (function (Twig) {
                 base = template.url;
             }
         } else if (template.path) {
-            // Get the system-specific path separator
-            var path = require("path"),
-                sep = path.sep || sep_chr,
-                relative = new RegExp("^\\.{1,2}" + sep.replace("\\", "\\\\"));
-            file = file.replace(/\//g, sep);
-
-            if (template.base !== undefined && file.match(relative) == null) {
-                file = file.replace(template.base, '');
-                base = template.base + sep;
-            } else {
-                base = template.path;
-            }
-
-            base = base.replace(sep+sep, sep);
-            sep_chr = sep;
+            // if the file path is provided
+            // let's just use the path.resolve method to find the proper
+            // path relative to the current file
+            // TODO: take into consideration the template.base option
+            var path = require('path');
+            var thePath = path.resolve(path.dirname(template.path), file);
+            return thePath;
+//            // Get the system-specific path separator
+//            var path = require("path"),
+//                sep = path.sep || sep_chr,
+//                relative = new RegExp("^\\.{1,2}" + sep.replace("\\", "\\\\"));
+//            file = file.replace(/\//g, sep);
+//
+//            if (template.base !== undefined && file.match(relative) == null) {
+//                file = file.replace(template.base, '');
+//                base = template.base + sep;
+//            } else {
+//                base = template.path;
+//            }
+//
+//            base = base.replace(sep+sep, sep);
+//            sep_chr = sep;
         } else {
             throw new Twig.Error("Cannot extend an inline template.");
         }
